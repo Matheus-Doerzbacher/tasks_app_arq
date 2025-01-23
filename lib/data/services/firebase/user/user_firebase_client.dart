@@ -4,7 +4,7 @@ import 'package:tasks_app_arq/utils/result.dart';
 
 final userCollection = 'users';
 
-class TaskFirebaseClient {
+class UserFirebaseClient {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<Result<User>> addUser(User user) async {
