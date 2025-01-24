@@ -31,7 +31,7 @@ class AuthRepositoryRemote extends AuthRepository {
 
     switch (result) {
       case Ok<String?>():
-        if (_userLogged == null) {
+        if (result.value != null && _userLogged == null) {
           final jwt = JWT.verify(result.value!, SecretKey(jwtTokenKey));
           _userLogged = User(
             id: jwt.payload['id'] as String,

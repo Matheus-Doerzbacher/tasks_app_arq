@@ -18,11 +18,13 @@ class SharedPreferencesService {
       final sharedPreferences = await SharedPreferences.getInstance();
       _log.finer('Got token from SharedPreferences');
       final result = Result.ok(sharedPreferences.getString(_tokenKey));
-      if (result is Ok<String>) {
-        if (validateToken(result.value)) {
-          return Result.ok(result.value);
-        } else {
-          return Result.error(Exception('Token is not valid'));
+      if (result is Ok<String?>) {
+        if (result.value != null) {
+          if (validateToken(result.value!)) {
+            return Result.ok(result.value);
+          } else {
+            return Result.error(Exception('Token is not valid'));
+          }
         }
       }
       return result;
