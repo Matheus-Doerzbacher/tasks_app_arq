@@ -29,7 +29,9 @@ GoRouter router(
         GoRoute(
           path: Routes.home,
           builder: (context, state) => HomeScreen(
-            viewModel: HomeViewModel(),
+            viewModel: HomeViewModel(
+              authRepository: context.read(),
+            ),
           ),
         ),
       ],

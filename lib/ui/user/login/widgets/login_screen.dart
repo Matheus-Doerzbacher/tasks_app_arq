@@ -27,19 +27,23 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.addListener(_onResult);
+    widget.viewModel.login.addListener(_onResultLogin);
+    widget.viewModel.createUser.addListener(_onResultCreateUser);
   }
 
   @override
   void didUpdateWidget(covariant LoginScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-    oldWidget.viewModel.removeListener(_onResult);
-    widget.viewModel.addListener(_onResult);
+    oldWidget.viewModel.login.removeListener(_onResultLogin);
+    widget.viewModel.login.addListener(_onResultLogin);
+    oldWidget.viewModel.createUser.removeListener(_onResultCreateUser);
+    widget.viewModel.createUser.addListener(_onResultCreateUser);
   }
 
   @override
   void dispose() {
-    widget.viewModel.removeListener(_onResult);
+    widget.viewModel.login.removeListener(_onResultLogin);
+    widget.viewModel.createUser.removeListener(_onResultCreateUser);
     super.dispose();
   }
 
@@ -113,13 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 widget.viewModel.login.execute(
                                   (_email.value.text, _password.value.text),
                                 );
-                                _email.clear();
-                                _password.clear();
-                                _pageController.animateToPage(
-                                  1, // Índice da página de criação de conta
-                                  duration: const Duration(milliseconds: 300),
-                                  curve: Curves.easeInOut,
-                                );
                               }
                             },
                       child: widget.viewModel.login.running
@@ -156,130 +153,145 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildSignUpPage() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formSignUp,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset('assets/images/task.png', width: 400),
-              const SizedBox(height: 100),
-              TextFormField(
-                controller: _email,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Email é obrigatório';
-                  }
+    return SingleChildScrollView(
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formSignUp,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset('assets/images/task.png', width: 400),
+                const SizedBox(height: 100),
+                TextFormField(
+                  controller: _email,
+                  decoration: InputDecoration(labelText: 'Email'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Email é obrigatório';
+                    }
 
-                  if (!RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                      .hasMatch(value)) {
-                    return 'Email inválido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _name,
-                decoration: InputDecoration(labelText: 'Name'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Nome é obrigatório';
-                  }
-
-                  if (value.length < 3) {
-                    return 'Nome deve ter pelo menos 3 caracteres';
-                  }
-
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _password,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Senha é obrigatório';
-                  }
-
-                  if (value.length < 6) {
-                    return 'Senha deve ter pelo menos 6 caracteres';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _confirmPassword,
-                decoration: InputDecoration(labelText: 'Confirm Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Senha é obrigatório';
-                  }
-
-                  if (value != _password.value.text) {
-                    return 'As senhas não correspondem';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              ListenableBuilder(
-                listenable: widget.viewModel.createUser,
-                builder: (context, _) {
-                  return FilledButton(
-                    onPressed: widget.viewModel.createUser.running
-                        ? null
-                        : () {
-                            if (_formSignUp.currentState!.validate()) {
-                              final user = User(
-                                email: _email.value.text,
-                                name: _name.value.text,
-                                password: _password.value.text,
-                              );
-                              widget.viewModel.createUser.execute(user);
-                            }
-                          },
-                    child: widget.viewModel.createUser.running
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Criar conta'),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  _pageController.animateToPage(
-                    0, // Índice da página de criação de conta
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                child: Text(
-                  'Já tem uma conta? Faça login',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
+                    if (!RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                        .hasMatch(value)) {
+                      return 'Email inválido';
+                    }
+                    return null;
+                  },
                 ),
-              ),
-            ],
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _name,
+                  decoration: InputDecoration(labelText: 'Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nome é obrigatório';
+                    }
+
+                    if (value.length < 3) {
+                      return 'Nome deve ter pelo menos 3 caracteres';
+                    }
+
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _password,
+                  decoration: InputDecoration(labelText: 'Password'),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Senha é obrigatório';
+                    }
+
+                    if (value.length < 6) {
+                      return 'Senha deve ter pelo menos 6 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: _confirmPassword,
+                  decoration: InputDecoration(labelText: 'Confirm Password'),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Senha é obrigatório';
+                    }
+
+                    if (value != _password.value.text) {
+                      return 'As senhas não correspondem';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
+                ListenableBuilder(
+                  listenable: widget.viewModel.createUser,
+                  builder: (context, _) {
+                    return FilledButton(
+                      onPressed: widget.viewModel.createUser.running
+                          ? null
+                          : () {
+                              if (_formSignUp.currentState!.validate()) {
+                                final user = User(
+                                  email: _email.value.text,
+                                  name: _name.value.text,
+                                  password: _password.value.text,
+                                );
+                                widget.viewModel.createUser.execute(user);
+                                _name.clear();
+                                _password.clear();
+                                _confirmPassword.clear();
+                                _pageController.animateToPage(
+                                  0, // Índice da página de criação de conta
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                );
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Usuário criado com sucesso'),
+                                  ),
+                                );
+                              }
+                            },
+                      child: widget.viewModel.createUser.running
+                          ? SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Criar conta'),
+                    );
+                  },
+                ),
+                const SizedBox(height: 20),
+                TextButton(
+                  onPressed: () {
+                    _pageController.animateToPage(
+                      0, // Índice da página de criação de conta
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                    );
+                  },
+                  child: Text(
+                    'Já tem uma conta? Faça login',
+                    style:
+                        TextStyle(color: Theme.of(context).colorScheme.primary),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  void _onResult() {
+  void _onResultLogin() {
     if (widget.viewModel.login.completed) {
       widget.viewModel.login.clearResult();
       context.go(Routes.home);
@@ -297,7 +309,11 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       );
-    } else if (widget.viewModel.createUser.error) {
+    }
+  }
+
+  void _onResultCreateUser() {
+    if (widget.viewModel.createUser.error) {
       widget.viewModel.createUser.clearResult();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

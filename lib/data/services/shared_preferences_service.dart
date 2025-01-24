@@ -2,8 +2,10 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tasks_app_arq/jwt_secret.dart';
 
 import '../../utils/result.dart';
 
@@ -15,10 +17,27 @@ class SharedPreferencesService {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
       _log.finer('Got token from SharedPreferences');
-      return Result.ok(sharedPreferences.getString(_tokenKey));
+      final result = Result.ok(sharedPreferences.getString(_tokenKey));
+      if (result is Ok<String>) {
+        if (validateToken(result.value)) {
+          return Result.ok(result.value);
+        } else {
+          return Result.error(Exception('Token is not valid'));
+        }
+      }
+      return result;
     } on Exception catch (e) {
       _log.warning('Failed to get token', e);
       return Result.error(e);
+    }
+  }
+
+  bool validateToken(String token) {
+    try {
+      JWT.verify(token, SecretKey(jwtTokenKey));
+      return true;
+    } catch (e) {
+      return false;
     }
   }
 

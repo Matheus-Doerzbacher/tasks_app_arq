@@ -39,7 +39,11 @@ class UserFirebaseClient {
       }
       final userId = _firestore.collection(userCollection).doc().id;
       final passwordHash = await _hashPassword(user.password);
-      final userWithId = user.copyWith(id: userId, password: passwordHash);
+      final userWithId = user.copyWith(
+        id: userId,
+        email: user.email.toLowerCase(),
+        password: passwordHash,
+      );
       await _firestore
           .collection(userCollection)
           .doc(userId)
@@ -75,7 +79,7 @@ class UserFirebaseClient {
     try {
       final user = await _firestore
           .collection(userCollection)
-          .where('email', isEqualTo: email)
+          .where('email', isEqualTo: email.toLowerCase())
           .get();
 
       if (user.docs.isEmpty) {
