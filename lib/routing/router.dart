@@ -31,6 +31,7 @@ GoRouter router(
           builder: (context, state) => HomeScreen(
             viewModel: HomeViewModel(
               authRepository: context.read(),
+              taskRepository: context.read(),
             ),
           ),
         ),
