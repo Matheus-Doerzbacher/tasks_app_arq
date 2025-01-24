@@ -21,9 +21,12 @@ class TaskFirebaseClient {
     }
   }
 
-  Future<Result<List<Task>>> getTasks() async {
+  Future<Result<List<Task>>> getTasks(String userId) async {
     try {
-      final tasks = await _firestore.collection(taskCollection).get();
+      final tasks = await _firestore
+          .collection(taskCollection)
+          .where('userId', isEqualTo: userId)
+          .get();
       return Result.ok(
         tasks.docs.map((doc) => Task.fromJson(doc.data())).toList(),
       );
