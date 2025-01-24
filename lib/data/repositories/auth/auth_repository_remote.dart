@@ -1,17 +1,17 @@
 import 'package:logging/logging.dart';
 import 'package:tasks_app_arq/data/repositories/auth/auth_repository.dart';
-import 'package:tasks_app_arq/data/services/firebase/auth/auth_firebase_client.dart';
+import 'package:tasks_app_arq/data/services/firebase/user/user_firebase_client.dart';
 import 'package:tasks_app_arq/data/services/shared_preferences_service.dart';
 import 'package:tasks_app_arq/utils/result.dart';
 
 class AuthRepositoryRemote extends AuthRepository {
-  final AuthFirebaseClient _authFirebaseClient;
+  final UserFirebaseClient _userFirebaseClient;
   final SharedPreferencesService _sharedPreferencesService;
 
   AuthRepositoryRemote({
-    required AuthFirebaseClient authFirebaseClient,
+    required UserFirebaseClient userFirebaseClient,
     required SharedPreferencesService sharedPreferencesService,
-  })  : _authFirebaseClient = authFirebaseClient,
+  })  : _userFirebaseClient = userFirebaseClient,
         _sharedPreferencesService = sharedPreferencesService;
 
   bool? _isAuthenticated;
@@ -24,7 +24,7 @@ class AuthRepositoryRemote extends AuthRepository {
       case Ok<String?>():
         _isAuthenticated = result.value != null;
       case Error<String?>():
-        _log.severe(
+        _log.warning(
           'Failed to fech Token from SharedPreferences',
           result.error,
         );
@@ -48,7 +48,7 @@ class AuthRepositoryRemote extends AuthRepository {
     required String password,
   }) async {
     try {
-      final result = await _authFirebaseClient.loginUser(email, password);
+      final result = await _userFirebaseClient.loginUser(email, password);
 
       switch (result) {
         case Ok<String>():

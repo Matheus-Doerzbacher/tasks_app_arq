@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:tasks_app_arq/domain/models/user/user.dart';
 import 'package:tasks_app_arq/routing/routes.dart';
 import 'package:tasks_app_arq/ui/core/exception_message.dart';
-import 'package:tasks_app_arq/ui/login/view_models/login_viewmodel.dart';
+import 'package:tasks_app_arq/ui/user/login/view_models/login_viewmodel.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key, required this.viewModel});

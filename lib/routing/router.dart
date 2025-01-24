@@ -5,8 +5,8 @@ import 'package:tasks_app_arq/data/repositories/auth/auth_repository.dart';
 import 'package:tasks_app_arq/routing/routes.dart';
 import 'package:tasks_app_arq/ui/home/view_models/home_viewmodel.dart';
 import 'package:tasks_app_arq/ui/home/widgets/home_screen.dart';
-import 'package:tasks_app_arq/ui/login/view_models/login_viewmodel.dart';
-import 'package:tasks_app_arq/ui/login/widgets/login_screen.dart';
+import 'package:tasks_app_arq/ui/user/login/view_models/login_viewmodel.dart';
+import 'package:tasks_app_arq/ui/user/login/widgets/login_screen.dart';
 
 GoRouter router(
   AuthRepository authRepository,
