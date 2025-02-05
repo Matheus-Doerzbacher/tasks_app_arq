@@ -62,96 +62,102 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginPage() {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Form(
-          key: _formLogin,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 50),
-              Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(8),
-                child: Image.asset('assets/images/task.png', width: 400),
-              ),
-              const SizedBox(height: 50),
-              TextFormField(
-                controller: _email,
-                decoration: InputDecoration(labelText: 'Email'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Email é obrigatório';
-                  }
+      child: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formLogin,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 50),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: Image.asset('assets/images/task.png', width: 400),
+                  ),
+                  const SizedBox(height: 50),
+                  TextFormField(
+                    controller: _email,
+                    decoration: InputDecoration(labelText: 'Email'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Email é obrigatório';
+                      }
 
-                  if (!RegExp(
-                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                      .hasMatch(value)) {
-                    return 'Email inválido';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: _password,
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Senha é obrigatório';
-                  }
+                      if (!RegExp(
+                              r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+                          .hasMatch(value)) {
+                        return 'Email inválido';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    controller: _password,
+                    decoration: InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Senha é obrigatório';
+                      }
 
-                  if (value.length < 6) {
-                    return 'Senha deve ter pelo menos 6 caracteres';
-                  }
-                  return null;
-                },
+                      if (value.length < 6) {
+                        return 'Senha deve ter pelo menos 6 caracteres';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  ListenableBuilder(
+                    listenable: widget.viewModel.login,
+                    builder: (context, _) {
+                      return FilledButton(
+                        onPressed: widget.viewModel.login.running
+                            ? null
+                            : () {
+                                if (_formLogin.currentState!.validate()) {
+                                  widget.viewModel.login.execute(
+                                    (_email.value.text, _password.value.text),
+                                  );
+                                }
+                              },
+                        child: widget.viewModel.login.running
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child:
+                                    CircularProgressIndicator(strokeWidth: 2),
+                              )
+                            : const Text('Login'),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      _pageController.animateToPage(
+                        1, // Índice da página de criação de conta
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: Text(
+                      'Criar uma conta',
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              ListenableBuilder(
-                listenable: widget.viewModel.login,
-                builder: (context, _) {
-                  return FilledButton(
-                    onPressed: widget.viewModel.login.running
-                        ? null
-                        : () {
-                            if (_formLogin.currentState!.validate()) {
-                              widget.viewModel.login.execute(
-                                (_email.value.text, _password.value.text),
-                              );
-                            }
-                          },
-                    child: widget.viewModel.login.running
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Login'),
-                  );
-                },
-              ),
-              const SizedBox(height: 20),
-              TextButton(
-                onPressed: () {
-                  _pageController.animateToPage(
-                    1, // Índice da página de criação de conta
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.easeInOut,
-                  );
-                },
-                child: Text(
-                  'Criar uma conta',
-                  style:
-                      TextStyle(color: Theme.of(context).colorScheme.primary),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

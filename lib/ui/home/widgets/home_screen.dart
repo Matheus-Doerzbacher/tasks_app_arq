@@ -78,94 +78,115 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(width: 16),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Text(widget.viewModel.user?.name ?? 'Not User'),
-            ListenableBuilder(
-              listenable: widget.viewModel.addTask,
-              builder: (context, _) {
-                return Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _taskController,
-                        onSubmitted: (_) => _addTask(),
-                      ),
-                    ),
-                    ElevatedButton(
-                      onPressed: _addTask,
-                      child: const Text('Add'),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            ListenableBuilder(
-              listenable: widget.viewModel,
-              builder: (context, _) {
-                final loadCommand = widget.viewModel.load;
-                if (loadCommand.running) {
-                  return const CircularProgressIndicator();
-                }
-
-                if (loadCommand.error) {
-                  loadCommand.clearResult();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: Theme.of(context).colorScheme.error,
-                      content: Text('Erro ao carregar tarefas'),
-                    ),
-                  );
-                  return const SizedBox.shrink();
-                }
-
-                return widget.viewModel.tasks.isEmpty
-                    ? const SizedBox.shrink()
-                    : Expanded(
-                        child: ListView.builder(
-                          itemCount: widget.viewModel.tasks.length,
-                          itemBuilder: (context, index) => ListTile(
-                            title: Row(
-                              children: [
-                                Checkbox(
-                                  value: widget.viewModel.tasks[index].isFinish,
-                                  onChanged: (bool? value) {
-                                    widget.viewModel.finishTask.execute(
-                                      widget.viewModel.tasks[index],
-                                    );
-                                  },
-                                ),
-                                Text(
-                                  widget.viewModel.tasks[index].description,
-                                ),
-                              ],
-                            ),
-                            trailing: PopupMenuButton(
-                              itemBuilder: (context) => [
-                                PopupMenuItem(
-                                  child: Row(
-                                    children: [
-                                      Text('Deletar'),
-                                      const SizedBox(width: 8),
-                                      Icon(Icons.delete),
-                                    ],
-                                  ),
-                                  onTap: () =>
-                                      widget.viewModel.deleteTask.execute(
-                                    widget.viewModel.tasks[index].id ?? '',
-                                  ),
-                                ),
-                              ],
-                            ),
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 500),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              children: [
+                Text(widget.viewModel.user?.name ?? 'Not User'),
+                ListenableBuilder(
+                  listenable: widget.viewModel.addTask,
+                  builder: (context, _) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _taskController,
+                            onSubmitted: (_) => _addTask(),
                           ),
                         ),
+                        ElevatedButton(
+                          onPressed: _addTask,
+                          child: widget.viewModel.addTask.running
+                              ? const Text("Adicionando...")
+                              : const Text('Add'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+                ListenableBuilder(
+                  listenable: widget.viewModel,
+                  builder: (context, _) {
+                    final loadCommand = widget.viewModel.load;
+                    if (loadCommand.running) {
+                      return const CircularProgressIndicator();
+                    }
+
+                    if (loadCommand.error) {
+                      loadCommand.clearResult();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          backgroundColor: Theme.of(context).colorScheme.error,
+                          content: Text('Erro ao carregar tarefas'),
+                        ),
                       );
-              },
+                      return const SizedBox.shrink();
+                    }
+
+                    return widget.viewModel.tasks.isEmpty
+                        ? const SizedBox.shrink()
+                        : Expanded(
+                            child: ListView.builder(
+                              itemCount: widget.viewModel.tasks.length,
+                              itemBuilder: (context, index) => ListTile(
+                                title: Row(
+                                  children: [
+                                    Checkbox(
+                                      value: widget
+                                          .viewModel.tasks[index].isFinish,
+                                      onChanged: (bool? value) {
+                                        widget.viewModel.finishTask.execute(
+                                          widget.viewModel.tasks[index],
+                                        );
+                                      },
+                                    ),
+                                    Text(
+                                      widget.viewModel.tasks[index].description,
+                                      style: TextStyle(
+                                        color: widget
+                                                .viewModel.tasks[index].isFinish
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 100)
+                                            : null,
+                                        decoration: widget
+                                                .viewModel.tasks[index].isFinish
+                                            ? TextDecoration.lineThrough
+                                            : null,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                trailing: PopupMenuButton(
+                                  itemBuilder: (context) => [
+                                    PopupMenuItem(
+                                      child: Row(
+                                        children: [
+                                          Text('Deletar'),
+                                          const SizedBox(width: 8),
+                                          Icon(Icons.delete),
+                                        ],
+                                      ),
+                                      onTap: () =>
+                                          widget.viewModel.deleteTask.execute(
+                                        widget.viewModel.tasks[index].id ?? '',
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          );
+                  },
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
